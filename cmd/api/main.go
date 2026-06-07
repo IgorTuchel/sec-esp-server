@@ -10,16 +10,13 @@ import (
 )
 
 func main() {
-	db, err := config.OpenSQLite("data/app.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	h := &handlers.Handler{DB: db}
+	cfg := &handlers.Config{}
+	config.Startup(cfg)
+	defer cfg.Db.Close()
+	defer cfg.Redis.Close()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/status", h.Status)
+	mux.HandleFunc("/status", cfg.Status)
 
 	srv := &http.Server{
 		Addr:         ":8080",
